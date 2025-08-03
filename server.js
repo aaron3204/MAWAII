@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
@@ -19,7 +20,6 @@ const server = app.listen(port, () =>
 
 
 // code change start
-require('dotenv').config();
 const { GoogleGenerativeAI } = require("@google/generative-ai");
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_AI_KEY);
 console.log(genAI)
@@ -27,7 +27,7 @@ console.log(genAI)
 
 const io = require("socket.io")(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: process.env.CLIENT_URL || "http://localhost:3000",
     methods: ["GET", "POST"],
     credentials: true
   }
@@ -42,7 +42,10 @@ app.use(
 );
 app.use(bodyParser.json());
 // CORS middleware
-app.use(cors());
+app.use(cors({
+  origin: process.env.CLIENT_URL || "http://localhost:3000",
+  credentials: true
+}));
 
 // code change start
 app.post("/gemini", async (req, res) => {
