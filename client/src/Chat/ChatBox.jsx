@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef, } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import Grid from "@material-ui/core/Grid";
 import Typography from "@material-ui/core/Typography";
@@ -126,11 +126,10 @@ const ChatBox = (props) => {
 
 
   let loading = 0
-  let changed = 0
 
   function loading_message(){
-    if(loading==7){
-      loading=0
+    if(loading === 7){
+      loading = 0
     }
     setNewMessage("Loading"+".".repeat(loading))
     loading++
@@ -139,33 +138,34 @@ const ChatBox = (props) => {
 
 
   useEffect(() => {
-    const socket = socketIOClient();
+    const socket = socketIOClient(process.env.REACT_APP_API_URL);
     socket.on("messages", (data) => setLastMessage(data));
   }, []);
 
-  const reloadMessages = () => {
+  const reloadMessages = useCallback(() => {
     // console.log("ran")
     if (props.scope === "Global Chat") {
       getGlobalMessages().then((res) => {
-        if(res.length!=messages.length){
+        if(res.length !== messages.length){
           // changed=1
           setMessages(res);
         }
       });
     } else if (props.scope !== null && props.conversationId !== null) {
       getConversationMessages(props.user._id).then((res) => {
-        if(res.length!=messages.length){
+        if(res.length !== messages.length){
           setMessages(res);
         }
       });
     } else {
       setMessages([]);
     }
-  };
+  }, [props.scope, props.conversationId, props.user, getGlobalMessages, getConversationMessages, messages.length]);
+  
   useEffect(() => {
     reloadMessages();
     // scrollToBottom();
-  }, [lastMessage, props.scope, props.conversationId, reloadMessages]);
+  }, [lastMessage, reloadMessages]);
 
   const scrollToBottom = () => {
     setTimeout(chatBottom.current.scrollIntoView(), 0);
@@ -176,10 +176,10 @@ const ChatBox = (props) => {
   const handleSubmit = (e) => {
     e.preventDefault();
     console.log(newMessage)
-    if(newMessage.indexOf("/ai")==0){
+    if(newMessage.indexOf("/ai") === 0){
       // setNewMessage("Loading response ....")
       let id = setInterval(loading_message, 100)
-      const URL = 'http://localhost:5001/gemini';
+      const URL = `${process.env.REACT_APP_API_URL}/gemini`;
       axios.post(URL, {
         message:newMessage.slice(3)
       })
