@@ -7,7 +7,7 @@ import Avatar from "@material-ui/core/Avatar";
 import LanguageIcon from "@material-ui/icons/Language";
 import Divider from "@material-ui/core/Divider";
 import { makeStyles } from "@material-ui/core/styles";
-import socketIOClient from "socket.io-client";
+import { io } from "socket.io-client";
 
 import { useGetConversations } from "../Services/chatService";
 import { authenticationService } from "../Services/authenticationService";
@@ -56,7 +56,7 @@ const Conversations = (props) => {
   }, [newConversation, getConversations]);
 
   useEffect(() => {
-    let socket = socketIOClient(process.env.REACT_APP_API_URL);
+    let socket = io(process.env.REACT_APP_API_URL);
     socket.on("messages", (data) => setNewConversation(data));
 
     return () => {

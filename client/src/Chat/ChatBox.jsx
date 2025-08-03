@@ -11,7 +11,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import Paper from "@material-ui/core/Paper";
-import socketIOClient from "socket.io-client";
+import { io } from "socket.io-client";
 import classnames from "classnames";
 import commonUtilites from "../Utilities/common";
 import axios from 'axios';
@@ -138,7 +138,7 @@ const ChatBox = (props) => {
 
 
   useEffect(() => {
-    const socket = socketIOClient(process.env.REACT_APP_API_URL);
+    const socket = io(process.env.REACT_APP_API_URL);
     socket.on("messages", (data) => setLastMessage(data));
   }, []);
 

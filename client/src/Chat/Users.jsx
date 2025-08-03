@@ -5,7 +5,7 @@ import ListItemText from "@material-ui/core/ListItemText";
 import ListItemAvatar from "@material-ui/core/ListItemAvatar";
 import Avatar from "@material-ui/core/Avatar";
 import { makeStyles } from "@material-ui/core/styles";
-import socketIOClient from "socket.io-client";
+import { io } from "socket.io-client";
 
 import { useGetUsers } from "../Services/userService";
 import commonUtilites from "../Utilities/common";
@@ -42,10 +42,8 @@ const Users = (props) => {
   }, [newUser, getUsers]);
 
   useEffect(() => {
-    const socket = socketIOClient(process.env.REACT_APP_API_URL);
-    socket.on("users", (data) => {
-      setNewUser(data);
-    });
+    const socket = io(process.env.REACT_APP_API_URL);
+    socket.on("messages", (data) => setNewUser(data));
   }, []);
 
   return (
